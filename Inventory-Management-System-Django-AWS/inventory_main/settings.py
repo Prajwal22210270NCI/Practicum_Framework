@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 #from django_aws_integrate.cred import get_secret #Calling AWS Secrets manager service from my own library
 #from django_aws_integrate.logs import log_activity #Calling AWS Cloud trail service from my own library
 #from .cred import get_secret # Old implementation before creating my library
@@ -22,6 +23,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -31,7 +33,7 @@ SECRET_KEY = 'django-insecure-&ign@k70phz7dcm60#6s7$@+%ng*pdqm4f!j^sb1=fekzv@v(+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cppprojectlibenv.eba-udimd8c9.eu-west-1.elasticbeanstalk.com', '127.0.0.1', '0f0e1a2de99a46f0a0a0529429ca715a.vfs.cloud9.eu-west-1.amazonaws.com']
+ALLOWED_HOSTS = ['*', '6byu74162b.execute-api.eu-west-1.amazonaws.com']
 
 
 # Application definition
@@ -97,13 +99,24 @@ WSGI_APPLICATION = 'inventory_main.wsgi.application'
 #     }
 # }
 
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.mysql', #Integrated Amazon RDS MySQL into Django and replaced default sqllite3 database 
+         'NAME': 'projectprajwal',
+         'USER': 'admin',
+         'PASSWORD': 'India#2345$',
+         'HOST': 'projectprajwal.clyw8o2ieoxc.eu-west-1.rds.amazonaws.com', # Amazon RDS Host Public Address
+         'PORT': '3306',
+     }
+ }
+
 # Default SQLite3 configuration
-{ 
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = { 
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -141,6 +154,50 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+
+# Define the logging directory
+LOGGING_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOGGING_DIR):
+    os.makedirs(LOGGING_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'django_requests.log'),
+            'formatter': 'verbose',
+        },
+        'sql_injection_file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'sql_injection.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'security': {
+            'handlers': ['sql_injection_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+
+
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
@@ -170,6 +227,6 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL =  None
 AWS_S3_VERITY = True
 #STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage' #Boto3 client used to use S3 storage instead of Django local storage
+#DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage' #Boto3 client used to use S3 storage instead of Django local storage
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

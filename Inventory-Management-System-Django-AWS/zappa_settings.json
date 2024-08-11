@@ -1,0 +1,20 @@
+{
+    "dev": {
+        "manage_roles": false,
+        "role_name":"inventory-manag-dev-ZappaLambdaExecutionRole",
+        "role_arn":"arn:aws:iam::590183699263:role/inventory-manag-dev-ZappaLambdaExecutionRole",
+        "aws_region": "eu-west-1",
+        "django_settings": "inventory_main.settings",
+        "exclude": [
+            "boto3",
+            "dateutil",
+            "botocore",
+            "s3transfer",
+            "concurrent"
+        ],
+        "profile_name": "default",
+        "project_name": "inventory-praj",
+        "runtime": "python3.11",
+        "s3_bucket": "zappa-mmcrzwwqc"
+    }
+}

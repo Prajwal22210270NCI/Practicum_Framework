@@ -155,10 +155,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 
-# Define the logging directory
-LOGGING_DIR = os.path.join(BASE_DIR, 'logs')
-if not os.path.exists(LOGGING_DIR):
-    os.makedirs(LOGGING_DIR)
+# # Define the logging directory
+# LOGGING_DIR = os.path.join(BASE_DIR, 'logs')
+# if not os.path.exists(LOGGING_DIR):
+#     os.makedirs(LOGGING_DIR)
 
 LOGGING = {
     'version': 1,
@@ -168,34 +168,58 @@ LOGGING = {
             'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
-        'file': {
+        'console': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGGING_DIR, 'django_requests.log'),
-            'formatter': 'verbose',
-        },
-        'sql_injection_file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOGGING_DIR, 'sql_injection.log'),
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'handlers': ['console'],
+            'level': 'INFO',
             'propagate': True,
         },
-        'security': {
-            'handlers': ['sql_injection_file'],
-            'level': 'WARNING',
+        'custom_logger': {  # Custom logger for CloudWatch
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate': False,
         },
     },
 }
+    # 'handlers': {
+    #     'file': {
+    #         'level': 'DEBUG',
+    #         'class': 'logging.FileHandler',
+    #         'filename': os.path.join(LOGGING_DIR, 'django_requests.log'),
+    #         'formatter': 'verbose',
+    #     },
+    #     'sql_injection_file': {
+    #         'level': 'WARNING',
+    #         'class': 'logging.FileHandler',
+    #         'filename': os.path.join(LOGGING_DIR, 'sql_injection.log'),
+    #         'formatter': 'verbose',
+    #     },
+    #},
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#         'security': {
+#             'handlers': ['sql_injection_file'],
+#             'level': 'WARNING',
+#             'propagate': False,
+#         },
+#     },
+# }
 
 
 STATIC_URL = 'static/'

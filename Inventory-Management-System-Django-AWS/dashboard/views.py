@@ -7,64 +7,25 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 import re
 import logging
+from inventory_main.Validate_input import validate, logMessage
+from django.contrib.auth import logout
+
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-def validate_input(data):
-    if not isinstance(data, str):
-        raise ValidationError("Invalid input: input must be a string")
-    
-    # Check for SQL Injection patterns
-    sql_injection_patterns = [
-        re.compile(r'(--|\b(select|union|insert|update|delete|drop|alter)\b)', re.IGNORECASE),
-        re.compile(r'(\bexec\b|\bexecute\b)', re.IGNORECASE)
-    ]
-    for pattern in sql_injection_patterns:
-        if pattern.search(data):
-            logger.warning(f"SQL injection attempt detected: {data}")
-            raise ValueError("Invalid input: possible SQL injection detected")
-            #raise ValidationError("Invalid input: possible SQL injection detected")
-
-    # Check for XSS patterns
-    xss_patterns = [
-        re.compile(r'<script.*?>.*?</script>', re.IGNORECASE),
-        re.compile(r'javascript:', re.IGNORECASE)
-    ]
-    for pattern in xss_patterns:
-        if pattern.search(data):
-            raise ValidationError("Invalid input: possible XSS detected")
-
-    # Check for command injection patterns
-    command_injection_patterns = [
-        re.compile(r'(\||;|&|`|\$|\(|\)|<|>|\[|\]|\{|\}|\*|\?|!|~)', re.IGNORECASE),
-        re.compile(r'(\bsh\b|\bbash\b|\bperl\b|\bpython\b|\bphp\b)', re.IGNORECASE)
-    ]
-    for pattern in command_injection_patterns:
-        if pattern.search(data):
-            raise ValidationError("Invalid input: possible command injection detected")
-
-    # Check for LDAP injection patterns
-    ldap_injection_patterns = [
-        re.compile(r'(\(|\)|&|\||=)', re.IGNORECASE)
-    ]
-    for pattern in ldap_injection_patterns:
-        if pattern.search(data):
-            raise ValidationError("Invalid input: possible LDAP injection detected")
-
-    # Check for XML injection patterns
-    xml_injection_patterns = [
-        re.compile(r'(<\?xml|<!DOCTYPE|<!ENTITY)', re.IGNORECASE)
-    ]
-    for pattern in xml_injection_patterns:
-        if pattern.search(data):
-            raise ValidationError("Invalid input: possible XML injection detected")
-
-    return data
-
 #Index Page
 @login_required(login_url='user-login')
 def index(request):
+    print(1)
+    print(request.method)
+    print(request.user)
+    
+    if request.user.username == 'Admin OR 1=1':
+        logout(request)
+        logMessage(request.user.username)
+        return redirect('dashboard-index')
+    
     orders = Order.objects.all()
     products = Product.objects.all()
     orders_count = orders.count() # To get Orders count to display on Admin Dashboard
@@ -95,6 +56,7 @@ def index(request):
 #Staff Deatils Page
 @login_required(login_url='user-login')
 def staff(request):
+    print(2)
     workers = User.objects.all()
     workers_count = workers.count() # To get Staff's count to display on Admin Dashboard
     orders_count = Order.objects.all().count() # To get Orders count to display on Admin Dashboard
@@ -110,6 +72,7 @@ def staff(request):
 #Product Deatils Page
 @login_required(login_url='user-login')
 def product(request):
+    print(3)
     items = Product.objects.all() #ORM 'SELECT * FROM dashboard_product'
     products_count = items.count() # To get  products count to display on Admin Dashboard
     workers_count = User.objects.all().count() # To get Staff's count to display on Admin Dashboard
@@ -137,6 +100,7 @@ def product(request):
 #Deleting Product Page
 @login_required(login_url='user-login')
 def product_delete(request, pk):
+    print(4)
     item = Product.objects.get(id=pk)
     if request.method == 'POST':
         item.delete()
@@ -164,6 +128,7 @@ def product_update(request, pk):
 #Order Deatils Page
 @login_required(login_url='user-login')
 def order(request):
+    print(5)
     orders = Order.objects.all()
     orders_count = Order.objects.count() # To get Orders count to display on Admin Dashboard
     workers_count = User.objects.all().count() # To get Staff's count to display on Admin Dashboard
@@ -179,6 +144,7 @@ def order(request):
 #Staff Details Page
 @login_required(login_url='user-login')
 def staff_detail(request, pk):
+    print(6)
     worker = User.objects.get(id=pk)
     workers = User.objects.all()
     workers_count = workers.count() # To get Staff's count to display on Admin Dashboard

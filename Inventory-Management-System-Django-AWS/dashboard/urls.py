@@ -23,4 +23,5 @@ urlpatterns = [
     #Staff Details Page Url
     path('staff/details/<int:pk>', views.staff_detail, name='dashboard-staff-detail'),
 
+
 ]

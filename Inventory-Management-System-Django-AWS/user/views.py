@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from dashboard import order_sns
 from .forms import CreateUserForm, UserUpdateForm, ProfileUpdateForm
+from inventory_main.Validate_input import validate
 
 
 def register(request):
@@ -10,10 +11,15 @@ def register(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
+            if validate(username):
+            
 #            email_id = form.cleaned_data.get('email')
-            form.save()
-            messages.success(request, f'Account has been created for { username } Successfully! Please Continue to Log in')
-            return redirect('user-login')
+                form.save()
+                messages.success(request, f'Account has been created for { username } Successfully! Please Continue to Log in')
+                return redirect('user-login')
+            else:
+                messages.error(request, f'Illegal Unsername { username } ')
+                return redirect('dashboard-index')
     else:
         form = CreateUserForm()
     context = {
@@ -23,6 +29,9 @@ def register(request):
 
 def profile(request):
     return render(request, 'user/profile.html')
+
+def logout(request):
+    return render(request,'user/logout.html')
 
 def profile_update(request):
     if request.method == 'POST':
